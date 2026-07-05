@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Crystal Pane Service Completion App</title>
+<style>
+:root{
+  --bg:#f3f7fb; --card:#ffffff; --ink:#102033; --muted:#607287; --line:#d8e1ea;
+  --brand:#0d5d87; --brand2:#1395c9; --danger:#c94343; --ok:#16834a; --warn:#b7791f;
+  --shadow:0 10px 25px rgba(16,32,51,.10);
+}
+*{box-sizing:border-box}
+html,body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.app{max-width:520px;margin:0 auto;min-height:100vh;background:linear-gradient(180deg,#e8f5fb 0%,#f7fbfd 28%,#f3f7fb 100%)}
+header{position:sticky;top:0;z-index:10;background:rgba(247,251,253,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 16px}
+.logo{display:flex;align-items:center;gap:10px}
+.mark{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;color:white;font-weight:900;letter-spacing:-1px}
+h1{font-size:20px;margin:0;line-height:1.05}
+.sub{font-size:12px;color:var(--muted);margin-top:2px}
+main{padding:16px}
+.screen{display:none}.screen.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:16px;margin:0 0 14px}
+h2{font-size:22px;margin:0 0 12px}
+h3{font-size:17px;margin:0 0 10px}
+p{line-height:1.35}
+.btn{width:100%;border:0;border-radius:14px;padding:14px 16px;font-size:16px;font-weight:700;background:var(--brand);color:white;margin:7px 0;cursor:pointer}
+.btn.secondary{background:#e7eef5;color:var(--ink)}
+.btn.ghost{background:white;color:var(--brand);border:1px solid var(--line)}
+.btn.danger{background:var(--danger)}
+.row{display:flex;gap:10px}.row>.btn{flex:1}
+label{display:block;font-size:13px;color:var(--muted);font-weight:700;margin:12px 0 6px}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:13px;font-size:16px;background:white;color:var(--ink)}
+textarea{min-height:92px;resize:vertical}
+.search{position:relative}
+.client-list{display:grid;gap:10px}
+.client{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff;cursor:pointer}
+.client strong{display:block;font-size:16px}.client span{color:var(--muted);font-size:13px}
+.tag{display:inline-flex;align-items:center;border-radius:999px;background:#e9f3f8;color:var(--brand);padding:5px 9px;margin:4px 4px 0 0;font-size:12px;font-weight:700}
+.scope-grid,.zone-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:11px 10px;text-align:center;background:#fff;font-weight:700;color:var(--ink)}
+.chip.on{background:var(--brand);color:white;border-color:var(--brand)}
+.progress{height:10px;background:#dce7ef;border-radius:999px;overflow:hidden;margin:12px 0}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));width:0%}
+.question{font-size:26px;font-weight:900;margin:6px 0 8px}
+.yesno{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.yesno .btn{font-size:18px}
+.finding{border-left:5px solid var(--brand);padding:10px 12px;background:#f7fbfd;border-radius:12px;margin:10px 0}
+.finding.high{border-color:var(--danger)}.finding.medium{border-color:var(--warn)}.finding.low{border-color:var(--ok)}
+.photo-preview{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.photo-preview img{width:82px;height:82px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.small{font-size:12px;color:var(--muted)}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:7px;font-size:14px}.kv b{color:var(--muted)}
+.report{background:white;color:#111;padding:24px;border-radius:0}
+.report h1{font-size:25px}.report h2{font-size:18px;border-bottom:2px solid #d8e1ea;padding-bottom:6px;margin-top:20px}
+.report .finding{break-inside:avoid;page-break-inside:avoid}
+.report img{max-width:100%;border-radius:8px;margin:6px 0;border:1px solid #ddd}
+.hidden{display:none!important}
+.notice{background:#fff8e6;border:1px solid #f1d28a;border-radius:14px;padding:12px;color:#5b4300}
+footer{padding:12px 16px;color:var(--muted);font-size:12px;text-align:center}
+@media print{
+  body{background:white}.app,main{max-width:none;background:white;padding:0}header,.no-print,footer{display:none!important}
+  .screen{display:none!important}.screen#printScreen{display:block!important}
+  .card{box-shadow:none;border:0;margin:0;padding:0}.report{padding:0}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="no-print">
+  <div class="logo">
+    <div class="mark">CP</div>
+    <div><h1>Crystal Pane</h1><div class="sub">Commercial Glass & Exterior Asset Maintenance</div></div>
+  </div>
+</header>
+<main>
+<section id="home" class="screen active">
+  <div class="card">
+    <h2>Service Completion App</h2>
+    <p class="small">Client history, QR/client lookup, guided inspections, photos, recommendations, and PDF-ready service packs.</p>
+    <button class="btn" onclick="go('clients')">New Service Report</button>
+    <button class="btn secondary" onclick="go('previous')">Previous Reports</button>
+    <button class="btn ghost" onclick="go('settings')">Settings</button>
+  </div>
+  <div class="card">
+    <h3>Scan Client QR</h3>
+    <p class="small">On iPhone, QR scanning depends on browser support. If scanning is unavailable, use client search.</p>
+    <button class="btn secondary" onclick="scanQR()">Open QR Scanner</button>
+    <div id="qrScanBox" class="hidden">
+      <video id="qrVideo" playsinline style="width:100%;border-radius:14px;background:#000"></video>
+      <button class="btn ghost" onclick="stopQR()">Stop Scanner</button>
+    </div>
+  </div>
+</section>
+
+<section id="clients" class="screen">
+  <div class="card">
+    <h2>Select Client</h2>
+    <input id="clientSearch" placeholder="Start typing business name..." oninput="renderClients()">
+    <div id="clientList" class="client-list" style="margin-top:12px"></div>
+    <button class="btn ghost" onclick="go('home')">Back</button>
+  </div>
+</section>
+
+<section id="clientProfile" class="screen">
+  <div class="card">
+    <h2 id="profileName"></h2>
+    <div id="profileMeta" class="small"></div>
+    <div id="profileZones" style="margin-top:8px"></div>
+  </div>
+  <div class="card">
+    <h3>Previous Items To Re-check</h3>
+    <div id="recheckList"></div>
+  </div>
+  <div class="card">
+    <button class="btn" onclick="startReport()">Start New Report</button>
+    <button class="btn secondary" onclick="viewLastReport()">View Last Report</button>
+    <button class="btn ghost" onclick="go('clients')">Back</button>
+  </div>
+</section>
+
+<section id="details" class="screen">
+  <div class="card">
+    <h2>Client Details</h2>
+    <label>Business Name</label><input id="businessName">
+    <label>Site Address</label><input id="siteAddress">
+    <label>Contact Person</label><input id="contactPerson">
+    <label>Invoice Number</label><input id="invoiceNumber" placeholder="e.g. INV-00125">
+    <label>Service Date</label><input id="serviceDate" type="date">
+    <label>Weather</label>
+    <select id="weather"><option>Clear</option><option>Cloudy</option><option>Windy</option><option>Light rain earlier</option><option>Dusty conditions</option><option>Hot conditions</option></select>
+    <button class="btn" onclick="saveDetails()">Next</button>
+  </div>
+</section>
+
+<section id="scope" class="screen">
+  <div class="card">
+    <h2>Scope of Works</h2>
+    <div id="scopeGrid" class="scope-grid"></div>
+    <label>Additional work completed / site notes</label>
+    <textarea id="scopeNotes" placeholder="Short summary of completed work..."></textarea>
+    <button class="btn" onclick="saveScope()">Next</button>
+  </div>
+</section>
+
+<section id="zone" class="screen">
+  <div class="card">
+    <h2>Asset Zone</h2>
+    <p class="small">For larger clients, record observations by zone rather than individual windows.</p>
+    <div id="zoneGrid" class="zone-grid"></div>
+    <label>Specific location note</label>
+    <input id="locationNote" placeholder="e.g. North elevation, Section 3">
+    <button class="btn" onclick="saveZone()">Begin Inspection</button>
+  </div>
+</section>
+
+<section id="inspect" class="screen">
+  <div class="card">
+    <div class="small" id="progressText"></div>
+    <div class="progress"><div id="progressBar"></div></div>
+    <div class="tag" id="sectionTag"></div>
+    <div class="question" id="questionText"></div>
+    <div class="yesno">
+      <button class="btn secondary" onclick="answerNo()">No</button>
+      <button class="btn danger" onclick="answerYes()">Yes</button>
+    </div>
+    <button class="btn ghost" onclick="skipSection()">Skip Section</button>
+  </div>
+</section>
+
+<section id="findingForm" class="screen">
+  <div class="card">
+    <h2 id="findingTitle"></h2>
+    <label>Photo</label>
+    <input id="photoInput" type="file" accept="image/*" capture="environment" multiple onchange="previewPhotos(event)">
+    <div id="photoPreview" class="photo-preview"></div>
+    <label>Severity</label>
+    <select id="severity" onchange="setSuggestedRecommendation()"><option>Minor</option><option>Moderate</option><option>Severe</option></select>
+    <label>Recommended Action</label>
+    <select id="recommendation"></select>
+    <label>Notes</label>
+    <textarea id="findingNotes"></textarea>
+    <button class="btn" onclick="saveFinding()">Save & Continue</button>
+  </div>
+</section>
+
+<section id="summary" class="screen">
+  <div class="card">
+    <h2>Summary</h2>
+    <div id="summaryStats"></div>
+    <label>Final comments</label>
+    <textarea id="finalComments" placeholder="Optional closing comments for client..."></textarea>
+    <button class="btn" onclick="buildReport()">Generate Service Completion Pack</button>
+    <button class="btn secondary" onclick="go('inspect')">Back to Inspection</button>
+  </div>
+</section>
+
+<section id="previous" class="screen">
+  <div class="card"><h2>Previous Reports</h2><div id="previousReports"></div><button class="btn ghost" onclick="go('home')">Back</button></div>
+</section>
+
+<section id="settings" class="screen">
+  <div class="card">
+    <h2>Settings</h2>
+    <label>Gmail signature appended to reports</label>
+    <textarea id="gmailSignature">Kind regards,
+
+Daniel Alchin
+Crystal Pane
+Commercial Glass & Exterior Asset Maintenance
+Email: crystalpane.portaugusta@gmail.com</textarea>
+    <button class="btn" onclick="saveSettings()">Save Settings</button>
+    <button class="btn ghost" onclick="go('home')">Back</button>
+  </div>
+</section>
+
+<section id="printScreen" class="screen">
+  <div class="card"><div id="reportOutput" class="report"></div></div>
+  <div class="card no-print">
+    <button class="btn" onclick="window.print()">Save / Print PDF</button>
+    <button class="btn secondary" onclick="saveReport()">Save Report History</button>
+    <button class="btn ghost" onclick="go('home')">Home</button>
+  </div>
+</section>
+</main>
+<footer class="no-print">Crystal Pane · Service Completion Pack System</footer>
+</div>
+
+<script>
+const scopes=["External Windows","Internal Windows","Shopfront Glass","Doors","Frames","Window Sills","Flyscreens","Signage","Solar Panels","Glass Pool Fencing","Other"];
+const clients=[
+ {id:"seaview",name:"Seaview Christian College",address:"Port Augusta, SA",contact:"",type:"School",zones:["Administration - North","Administration - South","Block A - North","Block A - South","Block B - North","Block B - South","Library","Hall","Covered Walkways"],scope:["External Windows","Internal Windows","Doors","Frames","Window Sills","Flyscreens"],open:[
+  {area:"Block A - North",issue:"Hard water staining",status:"Monitor",last:"Previous observation to re-check"},
+  {area:"Administration - Entry",issue:"Fingerprints / entry glass marking",status:"Recurring",last:"Check after service"}
+ ]},
+ {id:"rose",name:"Rose and Partners",address:"Port Augusta, SA",contact:"",type:"Commercial",zones:["Front Shopfront","Entry Doors","Side Elevation","Internal Office Glass"],scope:["External Windows","Internal Windows","Shopfront Glass","Doors","Frames","Window Sills"],open:[
+  {area:"Front Shopfront",issue:"Minor scratching",status:"Stable",last:"Re-check for worsening"}
+ ]},
+ {id:"dental",name:"Dental on Commercial",address:"Commercial Road, Port Augusta, SA",contact:"",type:"Dental / Commercial",zones:["Front Shopfront","Entry Doors","Waiting Area Glass","Side Windows"],scope:["External Windows","Internal Windows","Shopfront Glass","Doors","Frames","Window Sills"],open:[
+  {area:"Entry Doors",issue:"High touch-point marking",status:"Recurring",last:"Detail during each service"},
+  {area:"Front Shopfront",issue:"Mineral deposits",status:"Monitor",last:"Compare with previous photos"}
+ ]}
+];
+const checks=[
+ ["Window Glass",["Pitted","Scratched","Cracked","Hard water staining","Mineral deposits","Etching","Failed seal visible","Broken glazing"]],
+ ["Window Frames",["Corrosion","Paint deterioration","Oxidation","Loose fittings","Damaged seals","Drain holes blocked"]],
+ ["Tracks & Sills",["Debris","Drainage issue","Damage","Excessive dirt build-up"]],
+ ["Doors & Entry Glass",["Chips","Cracks","Scratches","Handle condition issue","Track condition issue"]],
+ ["Signage",["Dirty","Faded","Bird fouling","Damage","Loose fixings visible"]],
+ ["Solar Panels",["Heavy soiling","Bird fouling","Dust build-up","Leaf build-up","Visible cracks","Visible damage","Vegetation shading"]],
+ ["Glass Pool Fencing",["Calcium deposits","Water spotting","Scratches","Chips","Silicone deterioration","Gate latch appears damaged","Glass damage"]],
+ ["General Site Presentation",["Cobwebs","Bird fouling","General cleanliness concern","Graffiti","Exterior presentation concern"]]
+];
+const recMap={
+ "Cracked":"Recommend assessment by a qualified glazier.",
+ "Cracks":"Recommend assessment by a qualified glazier.",
+ "Broken glazing":"Recommend urgent assessment by a qualified glazier.",
+ "Visible cracks":"Recommend assessment by a qualified solar technician or installer.",
+ "Visible damage":"Recommend assessment by a qualified solar technician or installer.",
+ "Hard water staining":"Recommend monitoring and consider glass restoration if staining progresses.",
+ "Mineral deposits":"Recommend glass restoration or scheduled mineral deposit treatment.",
+ "Calcium deposits":"Recommend mineral deposit treatment and ongoing scheduled maintenance.",
+ "Scratched":"Monitor condition. If deterioration progresses, recommend specialist glass restoration advice.",
+ "Pitted":"Monitor pitting and consider restoration assessment.",
+ "Loose fittings":"Owner to arrange inspection by appropriate trade.",
+ "Loose fixings visible":"Owner to arrange inspection by appropriate trade.",
+ "Gate latch appears damaged":"Owner to arrange pool fencing inspection by a qualified contractor.",
+ "Corrosion":"Monitor deterioration and owner to consider maintenance by appropriate trade.",
+ "Bird fouling":"Recommend cleaning and continued scheduled maintenance.",
+ "Heavy soiling":"Recommend cleaning at the next appropriate service interval."
+};
+let state={client:null,details:{},scope:[],zone:"",locationNote:"",idx:0,findings:[],current:null,tempPhotos:[]};
+let flatChecks=[];
+checks.forEach(([s,arr])=>arr.forEach(i=>flatChecks.push({section:s,item:i})));
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active'); if(id==='clients')renderClients(); if(id==='previous')renderPrevious();}
+function renderClients(){let q=(document.getElementById('clientSearch').value||'').toLowerCase();let list=clients.filter(c=>c.name.toLowerCase().includes(q)).sort((a,b)=>a.name.localeCompare(b.name));document.getElementById('clientList').innerHTML=list.map(c=>`<div class="client" onclick="selectClient('${c.id}')"><strong>${c.name}</strong><span>${c.type} · ${c.address}</span></div>`).join('')||'<p>No clients found.</p>'}
+function selectClient(id){state.client=clients.find(c=>c.id===id);document.getElementById('profileName').textContent=state.client.name;document.getElementById('profileMeta').textContent=`${state.client.type} · ${state.client.address}`;document.getElementById('profileZones').innerHTML=state.client.zones.map(z=>`<span class="tag">${z}</span>`).join('');document.getElementById('recheckList').innerHTML=state.client.open.map(o=>`<div class="finding"><b>${o.area}</b><br>${o.issue}<br><span class="small">${o.status} · ${o.last}</span></div>`).join('')||'<p class="small">No open observations.</p>';go('clientProfile')}
+function startReport(){state.details={};state.scope=[...state.client.scope];state.findings=[];state.idx=0;document.getElementById('businessName').value=state.client.name;document.getElementById('siteAddress').value=state.client.address;document.getElementById('contactPerson').value=state.client.contact;document.getElementById('invoiceNumber').value='';document.getElementById('serviceDate').value=new Date().toISOString().slice(0,10);go('details')}
+function saveDetails(){['businessName','siteAddress','contactPerson','invoiceNumber','serviceDate','weather'].forEach(id=>state.details[id]=document.getElementById(id).value);renderScope();go('scope')}
+function renderScope(){document.getElementById('scopeGrid').innerHTML=scopes.map(s=>`<div class="chip ${state.scope.includes(s)?'on':''}" onclick="toggleScope('${s}',this)">${s}</div>`).join('')}
+function toggleScope(s,el){state.scope.includes(s)?state.scope=state.scope.filter(x=>x!==s):state.scope.push(s);el.classList.toggle('on')}
+function saveScope(){state.scopeNotes=document.getElementById('scopeNotes').value;renderZones();go('zone')}
+function renderZones(){document.getElementById('zoneGrid').innerHTML=state.client.zones.map(z=>`<div class="chip" onclick="selectZone('${z}',this)">${z}</div>`).join('')}
+function selectZone(z,el){state.zone=z;document.querySelectorAll('#zoneGrid .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on')}
+function saveZone(){state.locationNote=document.getElementById('locationNote').value;state.idx=0;renderQuestion();go('inspect')}
+function renderQuestion(){let c=flatChecks[state.idx];if(!c){renderSummary();go('summary');return}document.getElementById('sectionTag').textContent=c.section;document.getElementById('questionText').textContent=`${c.item}?`;document.getElementById('progressText').textContent=`${state.idx+1} of ${flatChecks.length}`;document.getElementById('progressBar').style.width=((state.idx)/flatChecks.length*100)+'%'}
+function answerNo(){state.idx++;renderQuestion()}
+function answerYes(){let c=flatChecks[state.idx];state.current=c;state.tempPhotos=[];document.getElementById('findingTitle').textContent=`${c.section} — ${c.item}`;document.getElementById('photoInput').value='';document.getElementById('photoPreview').innerHTML='';document.getElementById('severity').value='Minor';document.getElementById('findingNotes').value='';setSuggestedRecommendation();go('findingForm')}
+function setSuggestedRecommendation(){let c=state.current||{};let defaults=["Monitor during next scheduled service.","Recommend owner review and action at their discretion.","Recommend specialist trade assessment where required.",recMap[c.item]||"Recommend continued monitoring and scheduled maintenance."];document.getElementById('recommendation').innerHTML=[...new Set(defaults)].map(r=>`<option>${r}</option>`).join('')}
+function previewPhotos(ev){state.tempPhotos=[];let files=[...ev.target.files];let box=document.getElementById('photoPreview');box.innerHTML='';files.forEach(f=>{let reader=new FileReader();reader.onload=e=>{state.tempPhotos.push(e.target.result);box.innerHTML+=`<img src="${e.target.result}">`};reader.readAsDataURL(f)})}
+function saveFinding(){state.findings.push({section:state.current.section,item:state.current.item,zone:state.zone,locationNote:state.locationNote,severity:document.getElementById('severity').value,recommendation:document.getElementById('recommendation').value,notes:document.getElementById('findingNotes').value,photos:[...state.tempPhotos]});state.idx++;renderQuestion();go('inspect')}
+function skipSection(){let section=flatChecks[state.idx].section;while(state.idx<flatChecks.length && flatChecks[state.idx].section===section)state.idx++;renderQuestion()}
+function renderSummary(){document.getElementById('summaryStats').innerHTML=`<p><b>${state.findings.length}</b> observations recorded.</p><p><b>${state.findings.reduce((a,f)=>a+f.photos.length,0)}</b> photos attached.</p>`}
+function esc(s){return (s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+function buildReport(){let sig=localStorage.cpSignature||document.getElementById('gmailSignature')?.value||'';let bySec={};state.findings.forEach(f=>{(bySec[f.section] ||= []).push(f)});let invoice=esc(state.details.invoiceNumber||'No invoice number entered');let out=`<h1>Crystal Pane</h1><p><b>Service Completion Pack</b><br>A Better Way To View Your Business</p><h2>Client Details</h2><div class="kv"><b>Business</b><span>${esc(state.details.businessName)}</span><b>Site</b><span>${esc(state.details.siteAddress)}</span><b>Contact</b><span>${esc(state.details.contactPerson)}</span><b>Invoice Reference</b><span>${invoice}</span><b>Service Date</b><span>${esc(state.details.serviceDate)}</span><b>Weather</b><span>${esc(state.details.weather)}</span></div><h2>Scope of Works</h2><p>${state.scope.map(esc).join(' · ')}</p><p>${esc(state.scopeNotes)}</p><h2>Inspection Findings</h2>`;
+if(!state.findings.length) out+=`<p>No reportable observations were recorded during this service.</p>`;
+Object.keys(bySec).forEach(sec=>{out+=`<h3>${esc(sec)}</h3>`;bySec[sec].forEach(f=>{let cls=f.severity==='Severe'?'high':f.severity==='Moderate'?'medium':'low';out+=`<div class="finding ${cls}"><b>${esc(f.item)}</b><br><b>Zone:</b> ${esc(f.zone)} ${f.locationNote?`— ${esc(f.locationNote)}`:''}<br><b>Severity:</b> ${esc(f.severity)}<br><b>Recommended Action:</b> ${esc(f.recommendation)}${f.notes?`<br><b>Notes:</b> ${esc(f.notes)}`:''}<div>${f.photos.map(p=>`<img src="${p}">`).join('')}</div></div>`})});
+out+=`<h2>Recommendations Summary</h2>${state.findings.map(f=>`<p><b>${esc(f.severity)}:</b> ${esc(f.section)} — ${esc(f.item)}. ${esc(f.recommendation)}</p>`).join('')||'<p>No recommendations recorded.</p>'}`;
+out+=`<h2>Final Comments</h2><p>${esc(document.getElementById('finalComments').value)}</p>`;
+out+=`<h2>Disclaimer</h2><p>This Service Completion Pack is provided for the general information of the property owner, site manager, or authorised representative. The observations recorded in this report are visual observations only and are based on conditions apparent at the time of service.</p><p>This report is not a structural assessment, glazing certification, engineering report, building inspection, safety audit, or compliance assessment. Any recommendations provided are general maintenance recommendations only and should be considered and actioned at the owner's discretion.</p><p>Where damage, deterioration, cracking, loose fittings, electrical issues, structural concerns, or safety risks are identified, the owner should seek advice from an appropriately qualified trade or professional before taking further action.</p>`;
+out+=`<h2>Contact</h2><p style="white-space:pre-line">${esc(sig)}</p>`;
+document.getElementById('reportOutput').innerHTML=out;go('printScreen')}
+function saveReport(){let reports=JSON.parse(localStorage.cpReports||'[]');reports.unshift({date:new Date().toISOString(),client:state.details.businessName,invoice:state.details.invoiceNumber,findings:state.findings.length,html:document.getElementById('reportOutput').innerHTML});localStorage.cpReports=JSON.stringify(reports.slice(0,50));alert('Report saved to this device.')}
+function renderPrevious(){let reports=JSON.parse(localStorage.cpReports||'[]');document.getElementById('previousReports').innerHTML=reports.map((r,i)=>`<div class="client" onclick="openPrev(${i})"><strong>${esc(r.client)} — ${esc(r.invoice)}</strong><span>${new Date(r.date).toLocaleString()} · ${r.findings} findings</span></div>`).join('')||'<p class="small">No saved reports on this device yet.</p>'}
+function openPrev(i){let reports=JSON.parse(localStorage.cpReports||'[]');document.getElementById('reportOutput').innerHTML=reports[i].html;go('printScreen')}
+function saveSettings(){localStorage.cpSignature=document.getElementById('gmailSignature').value;alert('Settings saved.')}
+function viewLastReport(){go('previous')}
+async function scanQR(){if(!('BarcodeDetector' in window)){alert('QR scanner is not supported in this browser. Use client search.');return}document.getElementById('qrScanBox').classList.remove('hidden');let video=document.getElementById('qrVideo');let stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});video.srcObject=stream;await video.play();let detector=new BarcodeDetector({formats:['qr_code']});window.qrTimer=setInterval(async()=>{try{let codes=await detector.detect(video);if(codes.length){let raw=codes[0].rawValue;stopQR();let id=raw.split('client=').pop();if(clients.find(c=>c.id===id))selectClient(id);else alert('QR code read, but client not found.')}}catch(e){}},700)}
+function stopQR(){clearInterval(window.qrTimer);let v=document.getElementById('qrVideo');if(v.srcObject){v.srcObject.getTracks().forEach(t=>t.stop())}document.getElementById('qrScanBox').classList.add('hidden')}
+document.addEventListener('DOMContentLoaded',()=>{if(localStorage.cpSignature)document.getElementById('gmailSignature').value=localStorage.cpSignature;renderClients();});
+</script>
+</body>
+</html>
